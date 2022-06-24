@@ -1,12 +1,11 @@
 
 #from unittest import result
 import csv
-from dataclasses import replace
 import pyodbc as odbc
 import pandas as pd 
 import numpy as np
 from datetime import date, datetime
-
+print('butt b')
 try:
    
     conn =  odbc.connect("Driver=ODBC Driver 11 for SQL Server;Server=10.20.30.86;Database=CJR_Stage;UID=sa;Pwd=Sol@CJR!2019TR#")
@@ -54,29 +53,28 @@ df['Final Spend ND'] = df['Disaster Adjusted Spend'] * df['Updated Wage']
 df['NPRA ND'] = df['QA TP Raw'] - df['Final Spend ND']
 now = datetime.today()
 data_1 = pd.read_csv(r'C:/Users/muhammad.danish/Downloads/Patient_Search_Tool_crosstab.csv',encoding='utf-16',sep='\t',header=0)
-print('Patient search sheet loaded into Data frame')
 #data_1.to_csv(path, encoding='utf-8', index=False)
 df_1 = pd.DataFrame(data_1)
 df_1.columns = df_1.columns.str.replace(' ' ,'_')
 df_1.columns = df_1.columns.str.replace('_%' ,'')
 df_1.rename(columns = {'_NPRA':'NPRA','No._Of_Readmission':'Readmission'}, inplace = True)
+
+
 df_cd = pd.merge(df,df_1, how='inner', left_on = 'EPI_ID', right_on = 'Episode_ID')
-#df_cd['Spend Difference']  =  df_cd.columns.str.replace('_%' ,'')
-#df['Total Spend'] = df['Total Spend'].str.replace(r'$', '')
-#df_cd.columns = df_cd.columns.str.replace('$' ,'')
-df_cd['Final_Spend'] =df_cd["Total_Spend"].replace('[\$,]', '', regex=True).replace(",","").astype(float)
-df_cd['Final_TP'] = df_cd['Target_Spend'].replace('[\$,]','', regex=True,).astype(float)
-df_cd['Final_NPRA'] =df_cd["NPRA"].replace('[\$,]', '', regex=True).replace(",","").replace( '[(]','-',   regex=True ).replace( '[)]','',   regex=True ).astype(float)
-#df_cd['Total_Spend'] = df_cd['Total_Spend'].replace('$','')
-#df_cd['Total_Spend'] = df_cd['Total_Spend'].replace(',','')
-#pd.to_numeric( df_cd['EPI_TOTAL'], downcast="float")
-#pd.to_numeric( df_cd['Total_Spend'],downcast="float")
-df_cd['Spend Diff'] = df_cd['Final Spend ND']- df_cd['Final_Spend']
-df_cd['TP Diff'] = df_cd['QA TP Raw']- df_cd['Final_TP']
-df_cd['NPRA Diff'] = df_cd['NPRA ND']- df_cd['Final_NPRA']
-new_df = df_cd[['EPI_ID','Spend Diff', 'TP Diff','NPRA Diff']]
-#df_cd['NPRA_Diff'].apply(lambda x: (df_cd['NPRA ND'][x] - df_cd['NPRA'][x]))
-#df['Prices'] = np.where( df['Prices'] < 0, '-$' + df['Prices'].astype(str).str[1:], '$' + df['Prices'].astype(str))
-df_cd.to_csv (r'C:\Users\muhammad.danish\Desktop\work\Results\NPRA_Result_'+now.strftime("%Y-%m-%d")+'_'+now.strftime("%H.%M")+'.csv',index = False)
-new_df.to_csv (r'C:\Users\muhammad.danish\Desktop\work\Results\Required_only'+now.strftime("%Y-%m-%d")+'_'+now.strftime("%H.%M")+'.csv',index = False)
+#df_cd['Final'] = df_cd["Total_spend"].replace('[\$,]','', regex=True, inplace=True).astype(float)
+
+
+df_cd['Final1'] = df_cd['Total_Spend'].replace('[\$,]','', regex=True,).astype(float)
+df_cd['Finaltp'] = df_cd['Target_Spend'].replace('[\$,]','', regex=True,).astype(float)
+df_cd['FinalNPRA'] = df_cd['NPRA'].replace('[\$,]','', regex=True,).astype(float)
+
+
+
+
+df_cd['Spend Difference'] = df_cd['Final1'] - df_cd['Final Spend ND']
+df_cd['Target Price Difference'] = df_cd['Finaltp'] - df_cd['QA TP Raw']
+df_cd['NPRA Difference'] = df_cd['NPRA'] - df_cd['NPRA ND']
+
+df_cd.to_csv (r'C:\Users\muhammad.danish\Desktop\work\Results\NPRA_Result_'+now.strftime("%Y-%m-%d")+'_'+now.strftime("%H.%M")+'.csv',
+             index = False)
 print('Data Validation for patient search completed')
