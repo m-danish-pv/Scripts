@@ -63,18 +63,17 @@ df_1.rename(columns = {'_NPRA':'NPRA','No._Of_Readmission':'Readmission'}, inpla
 df_cd = pd.merge(df,df_1, how='inner', left_on = 'EPI_ID', right_on = 'Episode_ID')
 #df_cd['Final'] = df_cd["Total_spend"].replace('[\$,]','', regex=True, inplace=True).astype(float)
 
-
 df_cd['Final1'] = df_cd['Total_Spend'].replace('[\$,]','', regex=True,).astype(float)
 df_cd['Finaltp'] = df_cd['Target_Spend'].replace('[\$,]','', regex=True,).astype(float)
-df_cd['FinalNPRA'] = df_cd['NPRA'].replace('[\$,]','', regex=True,).astype(float)
-
-
-
+df_cd['FinalNPRA'] = df_cd['Final_NPRA'] =df_cd["NPRA"].replace('[\$,]', '', regex=True).replace(",","").replace( '[(]','-',   regex=True ).replace( '[)]','',   regex=True ).astype(float)
 
 df_cd['Spend Difference'] = df_cd['Final1'] - df_cd['Final Spend ND']
 df_cd['Target Price Difference'] = df_cd['Finaltp'] - df_cd['QA TP Raw']
-df_cd['NPRA Difference'] = df_cd['NPRA'] - df_cd['NPRA ND']
+df_cd['NPRA Difference'] = df_cd['FinalNPRA'] - df_cd['NPRA ND']
 
 df_cd.to_csv (r'C:\Users\muhammad.danish\Desktop\work\Results\NPRA_Result_'+now.strftime("%Y-%m-%d")+'_'+now.strftime("%H.%M")+'.csv',
              index = False)
+
+
+
 print('Data Validation for patient search completed')
